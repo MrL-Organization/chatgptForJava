@@ -1,0 +1,5 @@
+server:
+  port: 9389
+logging:
+  path: ./
+  file: stdout.log
