@@ -1,7 +1,8 @@
 package com.mrl.service.impl;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.mrl.conf.ConfigurationClass;
 import com.mrl.service.ChatGPTService;
 import com.mrl.service.QqRobotService;
 import com.mrl.util.HttpUtils;
@@ -16,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @Auther: MrL
@@ -28,14 +28,8 @@ import java.util.Map;
 @Slf4j
 public class QqRobotServiceImpl implements QqRobotService {
 
-    @Value("${cqhttp.url}")
-    String cqHttpUrl;
-
-    @Value("${cqhttp.userId}")
-    String userId;
-
-    @Value("${cqhttp.access_token}")
-    String access_token;
+    @Resource
+    ConfigurationClass configurationClass;
 
     @Resource
     ChatGPTService chatGPTService;
@@ -49,26 +43,55 @@ public class QqRobotServiceImpl implements QqRobotService {
         if("message".equals(jsonParam.getString("post_type"))){
             try {
                 String message = jsonParam.getString("message");
-                String aiMessage = "";
+                StringBuilder aiMessage = new StringBuilder();
                 if ("查询余额".equals(message)){
                     JSONObject aiResponse = chatGPTService.queryBalance();
                     JSONObject data = aiResponse.getJSONObject("data");
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("总共：")
+                    aiMessage.append("总共：")
                             .append(data.getString("total"))
-                            .append(",已用：")
+                            .append("，已用：")
                             .append(data.getString("used"))
-                            .append(",剩余：")
+                            .append("，剩余：")
                             .append(data.getString("balance"))
                             .append("。");
-                    aiMessage = sb.toString();
+                    //发送给机器人，然后机器人发送给我们
+                    sendPrivateMsg(aiMessage.toString());
+                }else if (message.startsWith("#生成图片")) {
+                    String prompt = message.substring(6);
+                    JSONObject aiResponse = chatGPTService.generatIMG(prompt);
+                    JSONArray arr = aiResponse.getJSONArray("data");
+                    if (arr == null || arr.size() == 0) {
+                        result.put("message","openai接口返回空！");
+                        return result;
+                    }
+                    for (Object o : arr) {
+                        if ("url".equals(configurationClass.OPENAI_IMG_FORMAT)) {
+                            String url = ((JSONObject) o).getString("url");
+                            aiMessage.append("[CQ:image,file=")
+                                        .append(url)
+                                        .append(",type=show,id=40004]");
+                        }else if ("b64_json".equals(configurationClass.OPENAI_IMG_FORMAT)) {
+                            String b64_json = ((JSONObject) o).getString("b64_json");
+                            aiMessage.append("[CQ:image,file=base64://")
+                                    .append(b64_json)
+                                    .append(",type=show,id=40004]");
+                        }
+                        //发送给机器人，然后机器人发送给我们
+                        sendPrivateMsg(aiMessage.toString());
+                        aiMessage.delete(0,aiMessage.length());
+                    }
+                }else if ("帮助".equals(message)){
+                    aiMessage.append("1.如果只想让AI回答问题，请直接输入问题\n")
+                                .append("2.如果要生成图片请说：【#生成图片 描述】\n")
+                                .append("3.输入【查询余额】可以查询当前openAIkey的剩余tokens");
+                    //发送给机器人，然后机器人发送给我们
+                    sendPrivateMsg(aiMessage.toString());
                 }else {
                     //获取ai的返回信息
-                    JSONObject aiResponse = chatGPTService.sendToAI(message);
-                    aiMessage = ((JSONObject) aiResponse.getJSONArray("choices").get(0)).getJSONObject("message").getString("content");
+                    JSONObject aiResponse = chatGPTService.answerQuestion(message);
+                    //发送给机器人，然后机器人发送给我们
+                    sendPrivateMsg(((JSONObject) aiResponse.getJSONArray("choices").get(0)).getJSONObject("message").getString("content"));
                 }
-                //发送给机器人，然后机器人发送给我们
-                sendToCqhttp(aiMessage);
                 result.put("message", "success");
             } catch (Exception e) {
                 log.error("出错:{}",e.getMessage());
@@ -80,7 +103,12 @@ public class QqRobotServiceImpl implements QqRobotService {
         return result;
     }
 
-    public JSONObject getJSONParam(HttpServletRequest request){
+    /**
+     * 获取Request对象中的参数转为JSONObject
+     * @param request
+     * @return
+     */
+    private JSONObject getJSONParam(HttpServletRequest request){
         log.debug("QqRobotServiceImpl.getJSONParam开始");
         JSONObject jsonParam = null;
         try {
@@ -102,15 +130,35 @@ public class QqRobotServiceImpl implements QqRobotService {
         return jsonParam;
     }
 
-    public void sendToCqhttp(String message) throws IOException, ConnectException {
+    /**
+     * 调取cq发送私聊消息的接口
+     * @param message 消息
+     * @throws IOException
+     * @throws ConnectException
+     */
+    @Override
+    public void sendPrivateMsg(String message) throws IOException, ConnectException {
         log.debug("QqRobotServiceImpl.sendToCqhttp开始");
-        String url = cqHttpUrl + "/send_private_msg?access_token=" + access_token;
+        String url = configurationClass.CQHTTP_URL + "/send_private_msg?access_token=" + configurationClass.ACCESS_TOKEN;
         HashMap params = new HashMap<String,String>();
-        params.put("user_id",userId);
+        params.put("user_id", configurationClass.CQHTTP_USERID);
         params.put("message",message);
-        log.info("发送机器人请求接口，参数:{}",params);
+        log.info("私聊消息接口url:{}",url);
+        log.info("私聊消息接口参数:{}",params);
         String response = HttpUtils.sendPost(url,null, HttpUtils.asUrlParams(params));
-        log.info("返回信息:{}", response);
+        log.info("私聊消息接口返回:{}", response);
         log.debug("QqRobotServiceImpl.sendToCqhttp结束");
+    }
+
+    /**
+     * cq码转义特殊字符
+     * @param s
+     * @return
+     */
+    private String cqCodeEscape(String s){
+        return s.replaceAll("&", "&amp;")
+                .replaceAll("\\[", "&#91;")
+                .replaceAll("]", "&#93;")
+                .replaceAll(",", "&#44;");
     }
 }

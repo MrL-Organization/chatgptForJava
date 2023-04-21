@@ -3,12 +3,14 @@ package com.mrl.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.mrl.conf.ConfigurationClass;
 import com.mrl.service.ChatGPTService;
 import com.mrl.util.HttpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,42 +25,30 @@ import java.util.Map;
 @Service
 @Slf4j
 public class ChatGPTServiceImpl implements ChatGPTService {
-    @Value("${openAI.domain}")
-    String domain;
+    //配置文件类
+    @Resource
+    ConfigurationClass configurationClass;
 
-    @Value("${openAI.key}")
-    String key;
-
-    @Value("${openAI.protocol}")
-    String protocol;
-
-    @Value("${openAI.model}")
-    String model;
-
-    public JSONObject sendToAI(String message) {
-        log.debug("ChatGPTService.sendToAI开始,参数message:{}",message);
+    public JSONObject answerQuestion(String message) {
+        log.debug("ChatGPTService.answerQuestion开始,参数message:{}",message);
         JSONObject result = new JSONObject();
         //接口返回信息
         String response = "";
         //请求参数
         HashMap param = new HashMap<String,Object>();
-        param.put("model",model);
+        param.put("model", configurationClass.OPENAI_MODEL);
         ArrayList messages = new ArrayList<Map>();
         HashMap messageMap = new HashMap<String,Object>();
         messageMap.put("role", "user");
         messageMap.put("content",message);
         messages.add(messageMap);
         param.put("messages",messages);
-        /*String param = "{\n" +
-                "    \"model\": \"" + model + "\",\n" +
-                "    \"messages\": [{\"role\": \"user\", \"content\": \"" + message + "!\"}]\n" +
-                "  }";*/
         //请求头
         HashMap headers = new HashMap<String,String>();
         headers.put("Content-Type", "application/json");
-        headers.put("Authorization", "Bearer " + key);
+        headers.put("Authorization", "Bearer " + configurationClass.OPENAI_KEY);
         //拼接URL
-        String url = protocol + "://" + domain + "/v1/chat/completions";
+        String url = configurationClass.OPENAI_PROTOCOL + "://" + configurationClass.OPENAI_DOMAIN + "/v1/chat/completions";
         try {
             log.info("发送post请求地址:{}", url);
             log.info("发送post请求头:{}", headers);
@@ -74,7 +64,45 @@ public class ChatGPTServiceImpl implements ChatGPTService {
             e.printStackTrace();
             result.put("message", e.getMessage());
         }
-        log.debug("ChatGPTService.sendToAI结束");
+        log.debug("ChatGPTService.answerQuestion结束");
+        return result;
+    }
+
+    @Override
+    public JSONObject generatIMG(String message) {
+        log.debug("ChatGPTService.generatIMG开始,参数message:{}",message);
+        JSONObject result = new JSONObject();
+        //接口返回信息
+        String response = "";
+        //请求参数
+        HashMap param = new HashMap<String,Object>();
+        param.put("n",configurationClass.OPENAI_IMG_NUM);
+        param.put("size",configurationClass.OPENAI_IMG_SIZE);
+        param.put("prompt",message);
+        param.put("response_format",configurationClass.OPENAI_IMG_FORMAT);
+        //请求头
+        HashMap headers = new HashMap<String,String>();
+        headers.put("Content-Type", "application/json");
+        headers.put("Authorization", "Bearer " + configurationClass.OPENAI_KEY);
+        //拼接URL
+        String url = configurationClass.OPENAI_PROTOCOL + "://"
+                + configurationClass.OPENAI_DOMAIN + "/v1/images/generations";
+        try {
+            log.info("发送post请求地址:{}", url);
+            log.info("发送post请求头:{}", headers);
+            log.info("发送post请求参数:{}",param);
+            response = HttpUtils.sendPost(url, headers, JSON.toJSONString(param));
+            log.info("发送post返回信息:{}", response.substring(0,200));
+            result = JSON.parseObject(response);
+        } catch (JSONException e) {
+            log.error("发送post请求接口返回格式不是json格式:{}", response.substring(0,200));
+            result.put("message", e.getMessage());
+        }catch (Exception e){
+            log.error("发送请求失败:{}", e.getMessage());
+            e.printStackTrace();
+            result.put("message", e.getMessage());
+        }
+        log.debug("ChatGPTService.generatIMG结束");
         return result;
     }
 
@@ -85,7 +113,9 @@ public class ChatGPTServiceImpl implements ChatGPTService {
         String response = "";
         try {
             //拼接URL
-            String url = protocol + "://" + domain + "/pro/balance?apiKey=" + key;
+            String url = configurationClass.OPENAI_PROTOCOL + "://"
+                    + configurationClass.OPENAI_DOMAIN + "/pro/balance?apiKey="
+                    + configurationClass.OPENAI_KEY;
             response = HttpUtils.sendGet(url);
             result = JSON.parseObject(response);
         } catch (JSONException e) {

@@ -3,6 +3,7 @@ package com.mrl.service;
 import com.alibaba.fastjson.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 /**
  * @Auther: MrL
@@ -12,4 +13,5 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface QqRobotService {
     JSONObject QqRobotEvenHandle(HttpServletRequest request);
+    void sendPrivateMsg(String message) throws IOException;
 }

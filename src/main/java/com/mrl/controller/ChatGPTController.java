@@ -29,7 +29,7 @@ public class ChatGPTController {
     public Result send(@RequestParam("message") String message){
         log.info("/gpt/send接口入参：{}",message);
         Result result = new Result();
-        JSONObject response = ChatGPTService.sendToAI(message);
+        JSONObject response = ChatGPTService.answerQuestion(message);
         if(response.containsKey("message")) {
             result.failResult(response);
         }else {
