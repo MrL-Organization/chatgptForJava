@@ -11,6 +11,7 @@ import java.util.Map;
  * @Version: 1.0
  */
 public interface ChatGPTService {
-    public JSONObject sendToAI(String message);
+    public JSONObject answerQuestion(String message);
+    public JSONObject generatIMG(String prompt);
     public JSONObject queryBalance();
 }

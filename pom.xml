@@ -42,52 +42,119 @@
         <!--打成jar包的名称-->
         <finalName>chatgptForJava</finalName>
         <plugins>
+            <!--定义项目的编译环境-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <!--maven的测试用例插件，建议跳过。-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
             <!--spring boot 的打包插件-->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.1.8.RELEASE</version>
-            </plugin>
-            <!-- 指定启动类，将依赖打成外部jar包 -->
-            <!--<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
-                    <archive>
-                        &lt;!&ndash; 生成的jar中，不要包含pom.xml和pom.properties这两个文件 &ndash;&gt;
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                        <manifest>
-                            &lt;!&ndash; 是否要把第三方jar加入到类构建路径 &ndash;&gt;
-                            <addClasspath>true</addClasspath>
-                            &lt;!&ndash; 外部依赖jar包的最终位置 &ndash;&gt;
-                            <classpathPrefix>lib/</classpathPrefix>
-                            &lt;!&ndash; 项目启动类 &ndash;&gt;
-                            <mainClass>com.mrl.ChatGPTTestApplication</mainClass>
-                        </manifest>
-                    </archive>
+                    <mainClass>com.mrl.ChatGPTApplication</mainClass>
+                    <fork>true</fork>
+                    <addResources>true</addResources>
+                    <outputDirectory>${project.build.directory}/jar</outputDirectory>
                 </configuration>
             </plugin>
-            &lt;!&ndash;拷贝依赖到jar外面的lib目录&ndash;&gt;
+            <!-- maven的打包插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <!-- 不打包资源文件（配置文件和依赖包分开） -->
+                    <excludes>
+                        <exclude>*.yml</exclude>
+                        <exclude>*.properties</exclude>
+                        <exclude>*.xml</exclude>
+                        <!--<exclude>mybatis/**</exclude>-->
+                        <!--<exclude>static/**</exclude>-->
+                    </excludes>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <!-- MANIFEST.MF 中 Class-Path 加入前缀 -->
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <!-- jar包不包含唯一版本标识 -->
+                            <useUniqueVersions>false</useUniqueVersions>
+                            <!--指定入口类 -->
+                            <mainClass>com.mrl.ChatGPTApplication</mainClass>
+                        </manifest>
+                        <manifestEntries>
+                            <!--MANIFEST.MF 中 Class-Path 加入资源文件目录 -->
+                            <Class-Path>./config/</Class-Path>
+                        </manifestEntries>
+                    </archive>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                </configuration>
+            </plugin>
+            <!-- 该插件的作用是用于复制依赖的jar包到指定的文件夹里 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-lib</id>
+                        <id>copy-dependencies</id>
                         <phase>package</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>target/lib</outputDirectory>
-                            <excludeTransitive>false</excludeTransitive>
-                            <stripVersion>false</stripVersion>
-                            <includeScope>runtime</includeScope>
+                            <outputDirectory>${project.build.directory}/lib/</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>-->
+            </plugin>
+
+            <!-- 该插件的作用是用于复制指定的文件 -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution> <!-- 复制配置文件 -->
+                        <id>copy-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <includes>
+                                        <include>*.yml</include>
+                                        <include>*.properties</include>
+                                        <include>*.xml</include>
+                                        <!--<include>mybatis/**</include>-->
+                                        <!--<include>static/**</include>-->
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.directory}/config</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
