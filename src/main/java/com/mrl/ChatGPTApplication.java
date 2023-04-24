@@ -14,6 +14,10 @@ import org.springframework.context.annotation.PropertySource;
 @SpringBootApplication
 public class ChatGPTApplication {
     public static void main(String[] args) {
-        SpringApplication.run(ChatGPTApplication.class, args);
+        try {
+            SpringApplication.run(ChatGPTApplication.class, args);
+        }catch (Throwable e){
+            e.printStackTrace();
+        }
     }
 }

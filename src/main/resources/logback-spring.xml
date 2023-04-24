@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
   <!--将错误日志按月，日保存-->
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
-    <!--
     <contextName>logback</contextName>
 
-    &lt;!&ndash;控制台输出内容的颜色转换以及格式&ndash;&gt;
+    <!--控制台输出内容的颜色转换以及格式-->
     <substitutionProperty name="logging.pattern.console"
-                          value="%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(-&#45;&#45;){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
-    &lt;!&ndash;日志文件输出内容的格式&ndash;&gt;
+                          value="%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+    <!--日志文件输出内容的格式-->
     <substitutionProperty name="logging.pattern.file"
-                          value="%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } -&#45;&#45; [%t] %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+                          value="%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
 
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
     <conversionRule conversionWord="wex"
@@ -17,9 +16,9 @@
     <conversionRule conversionWord="wEx"
                     converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
 
-    &lt;!&ndash;输出到控制台&ndash;&gt;
+    <!--输出到控制台-->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-        &lt;!&ndash;控制台使用layout节点&ndash;&gt;
+        <!--控制台使用layout节点-->
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>
                 ${logging.pattern.console}
@@ -27,8 +26,8 @@
         </layout>
     </appender>
 
-    &lt;!&ndash;按天生成日志&ndash;&gt;
-    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!--按天生成日志-->
+    <!--<appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <Prudent>true</Prudent>
         &lt;!&ndash;滚动策略，我配置了按天生成日志文件&ndash;&gt;
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -49,20 +48,20 @@
                 ${logging.pattern.file}
             </Pattern>
         </encoder>
-    </appender>
+    </appender>-->
 
-    &lt;!&ndash;这个logger里的配置相当于之前yml里的logging.level.com.lpc: trace&ndash;&gt;
-    &lt;!&ndash;additivity的作用&ndash;&gt;
-    &lt;!&ndash;true，则子Logger不止会在自己的appender里输出，还会在root的logger的appender里输出&ndash;&gt;
-    &lt;!&ndash;而这个logger里没配置appender，所以得交给root打印&ndash;&gt;
-    &lt;!&ndash;所以com.lpc包里的日志从TRACE级别开始&ndash;&gt;
-    &lt;!&ndash;其他包里的日志根据root的配置从INFO级别开始打印&ndash;&gt;
+    <!--这个logger里的配置相当于之前yml里的logging.level.com.lpc: trace-->
+    <!--additivity的作用-->
+    <!--true，则子Logger不止会在自己的appender里输出，还会在root的logger的appender里输出-->
+    <!--而这个logger里没配置appender，所以得交给root打印-->
+    <!--所以com.lpc包里的日志从TRACE级别开始-->
+    <!--其他包里的日志根据root的配置从INFO级别开始打印-->
     <logger name="com.lpc" level="TRACE" additivity="true">
     </logger>
 
     <root level="INFO">
         <appender-ref ref="console"/>
-        <appender-ref ref="file"/>
-    </root>-->
+        <!--<appender-ref ref="file"/>-->
+    </root>
 
 </configuration>

@@ -23,7 +23,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class ChatGPTServiceImpl implements ChatGPTService {
+public class ChatGPTServiceOpenAIImpl implements ChatGPTService {
     //配置文件类
     @Resource
     ConfigurationClass configurationClass;

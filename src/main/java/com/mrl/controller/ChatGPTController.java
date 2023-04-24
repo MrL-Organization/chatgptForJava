@@ -1,6 +1,7 @@
 package com.mrl.controller;
 
 import com.mrl.bean.Result;
+import com.mrl.conf.ChatGPTServiceFactory;
 import com.mrl.service.ChatGPTService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,13 +24,14 @@ import java.util.HashMap;
 public class ChatGPTController {
 
     @Resource
-    ChatGPTService ChatGPTService;
+    ChatGPTServiceFactory chatGPTServiceFactory;
+    //ChatGPTService chatGPTService;
 
     @RequestMapping("/text")
     public Result answerQuestion(@RequestParam("message") String message){
         log.info("/gpt/text接口入参：{}",message);
         Result result = new Result();
-        String response = ChatGPTService.answerQuestion(message);
+        String response = chatGPTServiceFactory.getChatGPTService().answerQuestion(message);
         HashMap<String,String> map = new HashMap<>();
         map.put("message",response);
         result.successResult(map);
@@ -41,7 +43,7 @@ public class ChatGPTController {
     public Result generatIMG(@RequestParam("message") String message){
         log.info("/gpt/img接口入参：{}",message);
         Result result = new Result();
-        ArrayList<String> response = ChatGPTService.generatIMG(message);
+        ArrayList<String> response = chatGPTServiceFactory.getChatGPTService().generatIMG(message);
         result.successResult(response);
         log.info("/gpt/img出参:{}",result);
         return result;
@@ -63,7 +65,7 @@ public class ChatGPTController {
     public Result queryBalance(){
         log.info("/gpt/img接口");
         Result result = new Result();
-        String response = ChatGPTService.queryBalance();
+        String response = chatGPTServiceFactory.getChatGPTService().queryBalance();
         HashMap<String,String> map = new HashMap<>();
         map.put("message",response);
         result.successResult(map);
