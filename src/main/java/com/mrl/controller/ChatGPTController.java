@@ -1,6 +1,5 @@
 package com.mrl.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.mrl.bean.Result;
 import com.mrl.service.ChatGPTService;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +8,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * @Auther: MrL
@@ -25,17 +25,49 @@ public class ChatGPTController {
     @Resource
     ChatGPTService ChatGPTService;
 
-    @RequestMapping("/send")
-    public Result send(@RequestParam("message") String message){
+    @RequestMapping("/text")
+    public Result answerQuestion(@RequestParam("message") String message){
+        log.info("/gpt/text接口入参：{}",message);
+        Result result = new Result();
+        String response = ChatGPTService.answerQuestion(message);
+        HashMap<String,String> map = new HashMap<>();
+        map.put("message",response);
+        result.successResult(map);
+        log.info("/gpt/text出参:{}",result);
+        return result;
+    }
+
+    @RequestMapping("/img")
+    public Result generatIMG(@RequestParam("message") String message){
+        log.info("/gpt/img接口入参：{}",message);
+        Result result = new Result();
+        ArrayList<String> response = ChatGPTService.generatIMG(message);
+        result.successResult(response);
+        log.info("/gpt/img出参:{}",result);
+        return result;
+    }
+
+    /*@RequestMapping("/chat")
+    public Result chat(@RequestParam("message") String message){
         log.info("/gpt/send接口入参：{}",message);
         Result result = new Result();
-        JSONObject response = ChatGPTService.answerQuestion(message);
-        if(response.containsKey("message")) {
-            result.failResult(response);
-        }else {
-            result.successResult(response);
-        }
+        String response = ChatGPTService.chat(message);
+        HashMap<String,String> map = new HashMap<>();
+        map.put("message",response);
+        result.successResult(map);
         log.info("/gpt/send出参:{}",result);
+        return result;
+    }*/
+
+    @RequestMapping("/balance")
+    public Result queryBalance(){
+        log.info("/gpt/img接口");
+        Result result = new Result();
+        String response = ChatGPTService.queryBalance();
+        HashMap<String,String> map = new HashMap<>();
+        map.put("message",response);
+        result.successResult(map);
+        log.info("/gpt/img接口出参:{}",result);
         return result;
     }
 }

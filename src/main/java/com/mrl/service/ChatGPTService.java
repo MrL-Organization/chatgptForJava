@@ -1,8 +1,9 @@
 package com.mrl.service;
 
-import com.alibaba.fastjson.JSONObject;
+import com.mrl.bean.Message;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Auther: MrL
@@ -11,7 +12,8 @@ import java.util.Map;
  * @Version: 1.0
  */
 public interface ChatGPTService {
-    public JSONObject answerQuestion(String message);
-    public JSONObject generatIMG(String prompt);
-    public JSONObject queryBalance();
+    String answerQuestion(String prompt);
+    ArrayList<String> generatIMG(String prompt);
+    String queryBalance();
+    String chat(List<Message> message);
 }

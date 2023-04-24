@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 /**
  * @Auther: MrL
@@ -29,12 +30,13 @@ public class QqRobotController {
     public Result QqRobotEven(HttpServletRequest request){
         log.info("接收到机器人的请求：{}", request.getRequestURI());
         Result result = new Result();
-        JSONObject response = robotService.QqRobotEvenHandle(request);
-        String message = response.getString("message");
-        if ("success".equals(message)) {
-            result.successResult(response);
-        }else {
-            result.failResult(response);
+        try {
+            robotService.QqRobotEvenHandle(request);
+            result.successResult();
+        } catch (Exception e) {
+            log.error("QqRobotController出错：{}",e.getMessage());
+            e.printStackTrace();
+            result.failResult(e.getMessage());
         }
         log.info("机器人处理接口返回：{}",result);
         return result;
@@ -44,9 +46,9 @@ public class QqRobotController {
     public void testRobot(@RequestParam("message") String message){
         log.info("测试与cqhttp的连通性：/testRobot");
         try {
-            robotService.sendPrivateMsg(message);
+            robotService.sendPrivateMsg(message,"");
         }catch (Exception e){
-            log.error("测试与cqhttp的连通性出错：",e.getMessage());
+            log.error("测试与cqhttp的连通性出错：{}",e.getMessage());
             e.printStackTrace();
         }
     }
