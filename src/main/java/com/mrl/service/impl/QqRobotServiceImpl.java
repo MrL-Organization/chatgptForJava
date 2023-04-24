@@ -1,6 +1,7 @@
 package com.mrl.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.mrl.conf.ChatGPTServiceFactory;
 import com.mrl.conf.ConfigurationClass;
 import com.mrl.service.ChatGPTService;
 import com.mrl.service.QqRobotService;
@@ -31,7 +32,8 @@ public class QqRobotServiceImpl implements QqRobotService {
     ConfigurationClass configurationClass;
 
     @Resource
-    ChatGPTService chatGPTService;
+    ChatGPTServiceFactory chatGPTServiceFactory;
+    //ChatGPTService chatGPTService;
 
     @Override
     public void QqRobotEvenHandle(HttpServletRequest request) throws IOException {
@@ -45,12 +47,12 @@ public class QqRobotServiceImpl implements QqRobotService {
                 user_id = jsonParam.getString("user_id");
                 String aiMessage = "";
                 if ("查询余额".equals(message)) {
-                    aiMessage = chatGPTService.queryBalance();
+                    aiMessage = chatGPTServiceFactory.getChatGPTService().queryBalance();
                     //发送给机器人，然后机器人发送给我们
                     sendPrivateMsg(aiMessage,user_id);
                 }else if (message.startsWith("#生成图片")) {
                     String prompt = message.substring(6);
-                    ArrayList<String> response = chatGPTService.generatIMG(prompt);
+                    ArrayList<String> response = chatGPTServiceFactory.getChatGPTService().generatIMG(prompt);
                     for (String s : response) {
                         StringBuilder sb = new StringBuilder(s);
                         sb.insert(0, "[CQ:image,file=")
@@ -60,12 +62,12 @@ public class QqRobotServiceImpl implements QqRobotService {
                 } else if ("帮助".equals(message)) {
                     String sb = "1.如果只想让AI回答问题，请直接输入问题\n" +
                             "2.如果要生成图片请说：【#生成图片 描述】\n" +
-                            "3.输入【查询余额】可以查询当前openAIkey的剩余tokens";
+                            "3.输入【查询余额】可以查询当前openAIkey的剩余美元";
                     //发送给机器人，然后机器人发送给我们
                     sendPrivateMsg(sb,user_id);
                 } else {
                     //获取ai的返回信息
-                    aiMessage = chatGPTService.answerQuestion(message);
+                    aiMessage = chatGPTServiceFactory.getChatGPTService().answerQuestion(message);
                     //发送给机器人，然后机器人发送给我们
                     sendPrivateMsg(aiMessage,user_id);
                 }

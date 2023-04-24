@@ -1,7 +1,6 @@
 package com.mrl.util;
 
 import java.io.*;
-import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
