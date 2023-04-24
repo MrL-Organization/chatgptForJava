@@ -5,6 +5,7 @@ import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +26,7 @@ public class HttpUtils {
      * @param param 请求参数，请求参数应该是 name1=value1&name2=value2 的形式。
      * @return URL 所代表远程资源的响应结果
      */
-    public static String sendGet(String url,HashMap<String,String> headers,String param) throws IOException,ConnectException {
+    public static String sendGet(String url,HashMap<String,String> headers,String param) throws IOException {
         String result = "";
         BufferedReader in = null;
         try {
@@ -54,14 +55,11 @@ public class HttpUtils {
                 System.out.println(key + "--->" + map.get(key));
             }
             // 定义 BufferedReader输入流来读取URL的响应
-            in = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
+            in = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
             String line;
             while ((line = in.readLine()) != null) {
                 result += line;
             }
-        } catch (IOException e) {
-            System.out.println("发送GET请求出现异常！" + e);
-            throw e;
         }
         // 使用finally块来关闭输入流
         finally {
@@ -83,7 +81,7 @@ public class HttpUtils {
      * @param param 请求参数，请求参数只能是 name1=value1&name2=value2。
      * @return 所代表远程资源的响应结果
      */
-    public static String sendGet(String url,String param) throws IOException,ConnectException {
+    public static String sendGet(String url,String param) throws IOException {
         return sendGet(url,null,param);
     }
 
@@ -93,7 +91,7 @@ public class HttpUtils {
      * @param url   发送请求的 URL
      * @return 所代表远程资源的响应结果
      */
-    public static String sendGet(String url) throws IOException,ConnectException {
+    public static String sendGet(String url) throws IOException {
         return sendGet(url,null,null);
     }
 
@@ -105,11 +103,11 @@ public class HttpUtils {
      * @param param 请求参数，请求参数可以是 name1=value1&name2=value2,也可以是json格式字符串。
      * @return 所代表远程资源的响应结果
      */
-    public static String sendPost(String url,HashMap<String,String> headers,String param) throws IOException, ConnectException {
+    public static String sendPost(String url,HashMap<String,String> headers,String param) throws  IOException{
 
         PrintWriter out = null;
         BufferedReader in = null;
-        String result = "";
+        StringBuilder result = new StringBuilder();
         try {
             URL realUrl = new URL(url);
             // 打开和URL之间的连接
@@ -137,14 +135,11 @@ public class HttpUtils {
                 out.flush();
             }
             // 定义BufferedReader输入流来读取URL的响应
-            in = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
+            in = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
             String line;
             while ((line = in.readLine()) != null) {
-                result += line;
+                result.append(line);
             }
-        } catch (Exception e) {
-            System.out.println("发送 POST 请求出现异常！" + e);
-            throw e;
         }
         // 使用finally块来关闭输出流、输入流
         finally {
@@ -159,7 +154,7 @@ public class HttpUtils {
                 ex.printStackTrace();
             }
         }
-        return result;
+        return result.toString();
     }
 
     /**
@@ -169,7 +164,7 @@ public class HttpUtils {
      * @param param 请求参数，请求参数可以是 name1=value1&name2=value2,也可以是json格式字符串。
      * @return 所代表远程资源的响应结果
      */
-    public static String sendPost(String url,String param) throws IOException,ConnectException {
+    public static String sendPost(String url,String param) throws IOException {
         return sendPost(url,null,param);
     }
 
@@ -179,7 +174,7 @@ public class HttpUtils {
      * @param url   发送请求的 URL
      * @return 所代表远程资源的响应结果
      */
-    public static String sendPost(String url) throws IOException,ConnectException {
+    public static String sendPost(String url) throws IOException {
         return sendPost(url,null,null);
     }
 

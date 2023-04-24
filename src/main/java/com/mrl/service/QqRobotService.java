@@ -1,9 +1,8 @@
 package com.mrl.service;
 
-import com.alibaba.fastjson.JSONObject;
-
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.net.ConnectException;
 
 /**
  * @Auther: MrL
@@ -12,6 +11,6 @@ import java.io.IOException;
  * @Version: 1.0
  */
 public interface QqRobotService {
-    JSONObject QqRobotEvenHandle(HttpServletRequest request);
-    void sendPrivateMsg(String message) throws IOException;
+    void QqRobotEvenHandle(HttpServletRequest request) throws IOException;
+    void sendPrivateMsg(String message, String user_id) throws IOException, ConnectException;
 }
