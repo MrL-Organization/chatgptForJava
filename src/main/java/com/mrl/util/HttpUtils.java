@@ -180,18 +180,18 @@ public class HttpUtils {
     /**
      * asUrlParams方法慨述: 将map转化key=123&v=456格式 为只要确保你的编码输入是正确的,就可以忽略掉
      */
-    public static String asUrlParams(Map<String, String> source) {
+    public static String asUrlParams(Map<String, Object> source) {
         Iterator<String> it = source.keySet().iterator();
         StringBuilder paramStr = new StringBuilder();
         while (it.hasNext()) {
             String key = it.next();
-            String value = source.get(key);
+            Object value = source.get(key);
             if (value == null || "".equals(value)) {
                 continue;
             }
             try {
                 // URL 编码
-                value = URLEncoder.encode(value, "utf-8");
+                value = URLEncoder.encode(value.toString(), "utf-8");
             } catch (UnsupportedEncodingException e) {
                 // do nothing
             }

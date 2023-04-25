@@ -1,5 +1,6 @@
 package com.mrl.controller;
 
+import com.mrl.bean.Message;
 import com.mrl.bean.Result;
 import com.mrl.conf.ChatGPTServiceFactory;
 import com.mrl.service.ChatGPTService;
@@ -45,31 +46,33 @@ public class ChatGPTController {
         Result result = new Result();
         ArrayList<String> response = chatGPTServiceFactory.getChatGPTService().generatIMG(message);
         result.successResult(response);
-        log.info("/gpt/img出参:{}",result);
+        log.info("/gpt/img接口出参:{}",result);
         return result;
     }
 
-    /*@RequestMapping("/chat")
+    @RequestMapping("/chat")
     public Result chat(@RequestParam("message") String message){
-        log.info("/gpt/send接口入参：{}",message);
+        log.info("/gpt/chat接口入参：{}",message);
         Result result = new Result();
-        String response = ChatGPTService.chat(message);
+        ArrayList<Message> messages = new ArrayList<>();
+        messages.add(new Message("user",message));
+        String response = chatGPTServiceFactory.getChatGPTService().chat(messages);
         HashMap<String,String> map = new HashMap<>();
         map.put("message",response);
         result.successResult(map);
-        log.info("/gpt/send出参:{}",result);
+        log.info("/gpt/chat接口出参:{}",result);
         return result;
-    }*/
+    }
 
     @RequestMapping("/balance")
     public Result queryBalance(){
-        log.info("/gpt/img接口");
+        log.info("/gpt/balance接口");
         Result result = new Result();
         String response = chatGPTServiceFactory.getChatGPTService().queryBalance();
         HashMap<String,String> map = new HashMap<>();
         map.put("message",response);
         result.successResult(map);
-        log.info("/gpt/img接口出参:{}",result);
+        log.info("/gpt/balance接口出参:{}",result);
         return result;
     }
 }
