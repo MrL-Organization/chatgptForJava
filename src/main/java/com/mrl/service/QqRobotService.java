@@ -13,4 +13,5 @@ import java.net.ConnectException;
 public interface QqRobotService {
     void QqRobotEvenHandle(HttpServletRequest request) throws IOException;
     void sendPrivateMsg(String message, String user_id) throws IOException;
+    void agreeFriendRequest(String flag,boolean approve,String remark) throws IOException;
 }

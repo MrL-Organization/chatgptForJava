@@ -28,6 +28,8 @@ public class ChatGPTServiceOpenAIImpl implements ChatGPTService {
     @Resource
     ConfigurationClass configurationClass;
 
+    //text文本生成接口，不智能，不好用
+    @Override
     public String answerQuestion(String prompt) {
         log.debug("ChatGPTService.answerQuestion开始,参数message:{}",prompt);
         //返回结果
@@ -50,7 +52,7 @@ public class ChatGPTServiceOpenAIImpl implements ChatGPTService {
         if(!"".equals(configurationClass.OPENAI_TEXT_MAX_TOKENS)){
             param.put("max_tokens",Integer.parseInt(configurationClass.OPENAI_TEXT_MAX_TOKENS));
         }
-        log.info("post请求参数:{}",param);
+        log.info("post请求参数:{}",JSON.toJSONString(param));
         try {
             response = HttpUtils.sendPost(url, headers, JSON.toJSONString(param));
             log.info("post请求相应信息:{}", response);
@@ -63,6 +65,77 @@ public class ChatGPTServiceOpenAIImpl implements ChatGPTService {
         }
         log.debug("ChatGPTService.answerQuestion结束");
         return result;
+    }
+
+    @Override
+    public String chat(List<Message> messages) {
+        log.debug("ChatGPTService.chat开始,参数message:{}",messages);
+        //返回结果
+        String result  = null;
+        //接口响应信息
+        String response = null;
+        //拼接URL
+        String url = configurationClass.OPENAI_PROTOCOL + "://"
+                + configurationClass.OPENAI_DOMAIN + "/v1/chat/completions";
+        log.info("post请求地址:{}", url);
+        //请求头
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json");
+        headers.put("Authorization", "Bearer " + configurationClass.OPENAI_KEY);
+       log.info("post请求头:{}", headers);
+        //请求参数
+        HashMap<String, Object> param = new HashMap<>();
+        param.put("model", configurationClass.OPENAI_CHAT_MODEL);
+        param.put("messages",messages);
+        if (!"".equals(configurationClass.OPENAI_TEXT_MAX_TOKENS)){
+            param.put("max_tokens",Integer.parseInt(configurationClass.OPENAI_TEXT_MAX_TOKENS));
+        }
+        log.info("post请求参数:{}",JSON.toJSONString(param));
+        try {
+            response = HttpUtils.sendPost(url, headers, JSON.toJSONString(param));
+            log.info("post请求响应:{}", response);
+            JSONObject resultJSON = JSON.parseObject(response);
+            result = ((JSONObject) resultJSON.getJSONArray("choices")
+                    .get(0)).getJSONObject("message").getString("content");
+        } catch (Exception e){
+            log.error("与openai服务连接异常：{}",e.getMessage());
+            result = "与openai服务连接异常：" + e.getMessage();
+            e.printStackTrace();
+        }
+        log.debug("ChatGPTService.answerQuestion结束");
+        return result;
+    }
+
+    @Override
+    public String queryBalance() {
+        log.debug("ChatGPTService.queryBalance开始");
+        String result = "";
+        String response = "";
+        try {
+            //拼接URL
+            String url = configurationClass.OPENAI_PROTOCOL + "://"
+                    + configurationClass.OPENAI_DOMAIN + "/pro/balance?apiKey="
+                    + configurationClass.OPENAI_KEY;
+            log.info("get请求地址:{}",url);
+            response = HttpUtils.sendGet(url);
+            log.info("get请求结果:{}",response);
+            JSONObject jsonObject = JSON.parseObject(response);
+            JSONObject data = jsonObject.getJSONObject("data");
+            String sb = "总共：" +
+                    data.getString("total") +
+                    "$，已用：" +
+                    data.getString("used") +
+                    "$，剩余：" +
+                    data.getString("balance") +
+                    "$。";
+            result = sb;
+        } catch (Exception e){
+            log.error("与openai服务连接异常：{}",e.getMessage());
+            result = "与openai服务连接异常：" + e.getMessage();
+            e.printStackTrace();
+        }
+        log.debug("ChatGPTService.queryBalance结束");
+        return result.toString();
     }
 
     @Override
@@ -83,18 +156,17 @@ public class ChatGPTServiceOpenAIImpl implements ChatGPTService {
         log.info("post请求头:{}", headers);
         //请求参数
         HashMap<String, Object> param = new HashMap<String,Object>();
-        Integer.parseInt(configurationClass.OPENAI_IMG_NUM);
-        param.put("n",configurationClass.OPENAI_IMG_NUM);
+        if (!"".equals(configurationClass.OPENAI_IMG_NUM)){
+            param.put("n",Integer.parseInt(configurationClass.OPENAI_IMG_NUM));
+        }
         if (!"".equals(configurationClass.OPENAI_IMG_SIZE)){
-            param.put("size",Integer.parseInt(configurationClass.OPENAI_IMG_SIZE));
-
+            param.put("size",configurationClass.OPENAI_IMG_SIZE);
         }
         if (!"".equals(configurationClass.OPENAI_IMG_FORMAT)){
             param.put("response_format",configurationClass.OPENAI_IMG_FORMAT);
-
         }
         param.put("prompt",prompt);
-        log.info("post请求参数:{}",param);
+        log.info("post请求参数:{}",JSON.toJSONString(param));
         try {
             response = HttpUtils.sendPost(url, headers, JSON.toJSONString(param));
             log.info("post请求响应信息:{}", response.substring(0,400));
@@ -117,74 +189,6 @@ public class ChatGPTServiceOpenAIImpl implements ChatGPTService {
             e.printStackTrace();
         }
         log.debug("ChatGPTService.generatIMG结束");
-        return result;
-    }
-
-    @Override
-    public String queryBalance() {
-        log.debug("ChatGPTService.queryBalance开始");
-        String result = "";
-        String response = "";
-        try {
-            //拼接URL
-            String url = configurationClass.OPENAI_PROTOCOL + "://"
-                    + configurationClass.OPENAI_DOMAIN + "/pro/balance?apiKey="
-                    + configurationClass.OPENAI_KEY;
-            response = HttpUtils.sendGet(url);
-            JSONObject jsonObject = JSON.parseObject(response);
-            JSONObject data = jsonObject.getJSONObject("data");
-            StringBuilder sb = new StringBuilder();
-            sb.append("总共：")
-                    .append(data.getString("total"))
-                    .append("$，已用：")
-                    .append(data.getString("used"))
-                    .append("$，剩余：")
-                    .append(data.getString("balance"))
-                    .append("$。");
-            result = sb.toString();
-        } catch (Exception e){
-            log.error("与openai服务连接异常：{}",e.getMessage());
-            result = "与openai服务连接异常：" + e.getMessage();
-            e.printStackTrace();
-        }
-        log.debug("ChatGPTService.queryBalance结束");
-        return result.toString();
-    }
-
-    public String chat(List<Message> messages) {
-        log.debug("ChatGPTService.chat开始,参数message:{}",messages);
-        //返回结果
-        String result  = null;
-        //接口响应信息
-        String response = null;
-        //拼接URL
-        String url = configurationClass.OPENAI_PROTOCOL + "://" + configurationClass.OPENAI_DOMAIN + "/v1/chat/completions";
-        log.info("post请求地址:{}", url);
-        //请求头
-        HashMap<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", "application/json");
-        headers.put("Authorization", "Bearer " + configurationClass.OPENAI_KEY);
-       log.info("post请求头:{}", headers);
-        //请求参数
-        HashMap<String, Object> param = new HashMap<>();
-        param.put("model", configurationClass.OPENAI_CHAT_MODEL);
-        param.put("messages",messages);
-        if (!"".equals(configurationClass.OPENAI_TEXT_MAX_TOKENS)){
-            param.put("max_tokens",Integer.parseInt(configurationClass.OPENAI_TEXT_MAX_TOKENS));
-        }
-        log.info("post请求参数:{}",param);
-        try {
-            response = HttpUtils.sendPost(url, headers, JSON.toJSONString(param));
-            log.info("post请求响应:{}", response);
-            JSONObject resultJSON = JSON.parseObject(response);
-            result = ((JSONObject) resultJSON.getJSONArray("choices")
-                    .get(0)).getString("text");
-        } catch (Exception e){
-            log.error("与openai服务连接异常：{}",e.getMessage());
-            result = "与openai服务连接异常：" + e.getMessage();
-            e.printStackTrace();
-        }
-        log.debug("ChatGPTService.answerQuestion结束");
         return result;
     }
 }
