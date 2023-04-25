@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Auther: MrL
@@ -27,16 +29,14 @@ public class QqRobotController {
     private QqRobotService robotService;
 
     @PostMapping
-    public Result QqRobotEven(HttpServletRequest request){
+    public Map QqRobotEven(HttpServletRequest request){
         log.info("接收到机器人的请求：{}", request.getRequestURI());
-        Result result = new Result();
+        Map result = null;
         try {
-            robotService.QqRobotEvenHandle(request);
-            result.successResult();
+            result = robotService.QqRobotEvenHandle(request);
         } catch (Exception e) {
             log.error("QqRobotController出错：{}",e.getMessage());
             e.printStackTrace();
-            result.failResult(e.getMessage());
         }
         log.info("机器人处理接口返回：{}",result);
         return result;

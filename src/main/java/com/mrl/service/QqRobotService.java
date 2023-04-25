@@ -3,6 +3,7 @@ package com.mrl.service;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.util.Map;
 
 /**
  * @Auther: MrL
@@ -11,7 +12,7 @@ import java.net.ConnectException;
  * @Version: 1.0
  */
 public interface QqRobotService {
-    void QqRobotEvenHandle(HttpServletRequest request) throws IOException;
+    Map QqRobotEvenHandle(HttpServletRequest request) throws IOException;
     void sendPrivateMsg(String message, String user_id) throws IOException;
     void agreeFriendRequest(String flag,boolean approve,String remark) throws IOException;
 }
