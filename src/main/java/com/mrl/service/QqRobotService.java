@@ -1,9 +1,10 @@
 package com.mrl.service;
 
+import com.alibaba.fastjson.JSONObject;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.net.ConnectException;
-import java.util.Map;
+import java.util.HashMap;
 
 /**
  * @Auther: MrL
@@ -12,7 +13,8 @@ import java.util.Map;
  * @Version: 1.0
  */
 public interface QqRobotService {
-    Map QqRobotEvenHandle(HttpServletRequest request) throws IOException;
+    HashMap<String,Object> QqRobotMessageHandle(JSONObject jsonParam) throws IOException;
+    HashMap<String,Object> QqRobotRequestHandle(JSONObject jsonParam) throws IOException;
     void sendPrivateMsg(String message, String user_id) throws IOException;
     void agreeFriendRequest(String flag,boolean approve,String remark) throws IOException;
 }
