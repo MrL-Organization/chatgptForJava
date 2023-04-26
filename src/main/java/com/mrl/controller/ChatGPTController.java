@@ -3,7 +3,6 @@ package com.mrl.controller;
 import com.mrl.bean.Message;
 import com.mrl.bean.Result;
 import com.mrl.conf.ChatGPTServiceFactory;
-import com.mrl.service.ChatGPTService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

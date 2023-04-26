@@ -5,7 +5,6 @@ import com.mrl.service.impl.ChatGPTServiceAliImpl;
 import com.mrl.service.impl.ChatGPTServiceBaiduImpl;
 import com.mrl.service.impl.ChatGPTServiceOpenAIImpl;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

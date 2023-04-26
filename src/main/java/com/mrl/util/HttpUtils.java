@@ -26,7 +26,7 @@ public class HttpUtils {
      * @return URL 所代表远程资源的响应结果
      */
     public static String sendGet(String url,HashMap<String,String> headers,String param) throws IOException {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         BufferedReader in = null;
         try {
             if(param != null && !"".equals(param)){
@@ -57,7 +57,7 @@ public class HttpUtils {
             in = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
             String line;
             while ((line = in.readLine()) != null) {
-                result += line;
+                result.append(line);
             }
         }
         // 使用finally块来关闭输入流
@@ -70,7 +70,7 @@ public class HttpUtils {
                 e2.printStackTrace();
             }
         }
-        return result;
+        return result.toString();
     }
 
     /**
