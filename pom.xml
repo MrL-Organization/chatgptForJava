@@ -153,6 +153,24 @@
                             <outputDirectory>${project.build.directory}/config</outputDirectory>
                         </configuration>
                     </execution>
+                    <execution> <!-- 复制Dockerfile -->
+                        <id>copy-dockerfile</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>.</directory>
+                                    <includes>
+                                        <include>Dockerfile</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
