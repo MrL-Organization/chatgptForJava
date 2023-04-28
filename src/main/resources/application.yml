@@ -1,2 +1,11 @@
 server:
   port: 9389
+  tomcat:
+    uri-encoding: UTF-8
+
+spring:
+  http:
+    encoding:
+      charset: utf-8
+      enabled: true
+      force: true

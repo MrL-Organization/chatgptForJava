@@ -1,0 +1,23 @@
+{
+
+    "name": "chatgptForJava",
+
+    "script": "java",
+
+    "args": [
+
+        "-jar",
+
+        "chatgptForJava.jar"
+
+        ],
+
+    "error_file":"",
+
+    "out_file":"",
+
+    "exec_interpreter": "",
+
+    "exec_mode": "fork"
+
+}

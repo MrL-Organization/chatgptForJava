@@ -26,29 +26,57 @@
         </layout>
     </appender>
 
-    <!--按天生成日志-->
-    <!--<appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <Prudent>true</Prudent>
-        &lt;!&ndash;滚动策略，我配置了按天生成日志文件&ndash;&gt;
+    <!-- 滚动记录info级别文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 -->
+    <appender name="info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 指定日志文件的名称 -->
+        <file>logs/stdout.log</file>
+        <!--滚动策略，我配置了按天生成日志文件-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            &lt;!&ndash;相对路径，生成的文件就在项目根目录下&ndash;&gt;
+            <!--相对路径，生成的文件就在项目根目录下-->
             <FileNamePattern>
-                logs/%d{yyyy-MM}/%d{yyyy-MM-dd}.log
+                logs/%d{yyyy-MM-dd}.log
             </FileNamePattern>
-            &lt;!&ndash;注意超过365天的日志文件会被删除，即使已经按天分开也会删除&ndash;&gt;
-            <MaxHistory>365</MaxHistory>
+            <!--注意超过30天的日志文件会被删除，即使已经按天分开也会删除-->
+            <MaxHistory>30</MaxHistory>
         </rollingPolicy>
-        &lt;!&ndash;日志文件里只保存ERROR及以上级别的日志&ndash;&gt;
+        <!--日志文件里只保存INFO及以上级别的日志-->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>ERROR</level>
+            <level>INFO</level>
         </filter>
-        &lt;!&ndash;文件使用encoder节点&ndash;&gt;
+        <!--文件使用encoder节点-->
         <encoder>
             <Pattern>
                 ${logging.pattern.file}
             </Pattern>
+            <charset>UTF-8</charset>
         </encoder>
-    </appender>-->
+    </appender>
+
+    <!-- 滚动记录error级别文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 -->
+    <appender name="error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 指定日志文件的名称 -->
+        <file>logs/error.log</file>
+        <!--滚动策略，我配置了按天生成日志文件-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--相对路径，生成的文件就在项目根目录下-->
+            <FileNamePattern>
+                logs/%d{yyyy-MM-dd}-error.log
+            </FileNamePattern>
+            <!--注意超过30天的日志文件会被删除，即使已经按天分开也会删除-->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <!--日志文件里只保存ERROR及以上级别的日志-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <!--文件使用encoder节点-->
+        <encoder>
+            <Pattern>
+                ${logging.pattern.file}
+            </Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
 
     <!--这个logger里的配置相当于之前yml里的logging.level.com.lpc: trace-->
     <!--additivity的作用-->
@@ -61,7 +89,8 @@
 
     <root level="INFO">
         <appender-ref ref="console"/>
-        <!--<appender-ref ref="file"/>-->
+        <appender-ref ref="info"/>
+        <appender-ref ref="error"/>
     </root>
 
 </configuration>

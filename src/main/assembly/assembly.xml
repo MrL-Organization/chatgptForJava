@@ -1,0 +1,51 @@
+<assembly>
+    <id>${project.version}</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <!-- 使用assembly拷贝依赖包 -->
+    <!--<dependencySets>-->
+    <!--<dependencySet>-->
+    <!--&lt;!&ndash; 是否包含自己（将项目生成的jar包也输出到lib目录） &ndash;&gt;-->
+    <!--<useProjectArtifact>false</useProjectArtifact>-->
+    <!--<outputDirectory>lib</outputDirectory>-->
+    <!--</dependencySet>-->
+    <!--</dependencySets>-->
+    <fileSets>
+        <!-- 从目标目录拷贝文件去压缩 -->
+        <fileSet>
+            <directory>target</directory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>target/lib</directory>
+            <outputDirectory>/lib</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>target/config</directory>
+            <outputDirectory>/config</outputDirectory>
+        </fileSet>
+
+        <!-- 从源目录拷贝文件去压缩 -->
+        <fileSet>
+            <directory>src/main/bin</directory>
+            <includes>
+                <include>*.sh</include>
+                <include>*.cmd</include>
+            </includes>
+            <outputDirectory>/bin</outputDirectory>
+        </fileSet>
+        <!-- readme -->
+        <fileSet>
+            <directory>./</directory>
+            <includes>
+                <include>README.md</include>
+                <include>pm2.json</include>
+            </includes>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>
