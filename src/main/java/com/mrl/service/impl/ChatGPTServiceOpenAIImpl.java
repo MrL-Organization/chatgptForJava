@@ -11,7 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -116,20 +118,20 @@ public class ChatGPTServiceOpenAIImpl implements ChatGPTService {
         try {
             //拼接URL
             String url = configurationClass.OPENAI_PROTOCOL + "://"
-                    + configurationClass.OPENAI_DOMAIN + "/pro/balance?apiKey="
-                    + configurationClass.OPENAI_KEY;
+                    + configurationClass.OPENAI_DOMAIN + "/dashboard/billing/credit_grants";
             log.info("查询余额get请求地址:{}",url);
-            response = HttpUtils.sendGet(url);
+            //请求头
+            HashMap<String, String> headers = new HashMap<>();
+            headers.put("Content-Type", "application/json");
+            headers.put("Authorization", "Bearer " + configurationClass.OPENAI_KEY);
+            response = HttpUtils.sendGet(url,headers);
             log.info("查询余额get请求结果:{}",response);
             JSONObject jsonObject = JSON.parseObject(response);
-            JSONObject data = jsonObject.getJSONObject("data");
-            result = "总共：" +
-                    data.getString("total") +
-                    "$，已用：" +
-                    data.getString("used") +
-                    "$，剩余：" +
-                    data.getString("balance") +
-                    "$。";
+            result = "剩余：" +
+                    jsonObject.getString("total_available") +
+                    "P，过期时间：" +
+                    new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss").format(new Date(jsonObject.getLongValue("expire_at"))) +
+                    "。";
         } catch (Exception e){
             log.error("与openai服务连接异常：{}",e.getMessage());
             result = "与openai服务连接异常：" + e.getMessage();
