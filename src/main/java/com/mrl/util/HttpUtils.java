@@ -77,6 +77,17 @@ public class HttpUtils {
      * 向指定 URL 发送GET方法的请求
      *
      * @param url   发送请求的 URL
+     * @param headers 请求参数，请求参数只能是 name1=value1&name2=value2。
+     * @return 所代表远程资源的响应结果
+     */
+    public static String sendGet(String url,HashMap<String,String> headers) throws IOException {
+        return sendGet(url,headers,null);
+    }
+
+    /**
+     * 向指定 URL 发送GET方法的请求
+     *
+     * @param url   发送请求的 URL
      * @param param 请求参数，请求参数只能是 name1=value1&name2=value2。
      * @return 所代表远程资源的响应结果
      */
@@ -165,6 +176,17 @@ public class HttpUtils {
      */
     public static String sendPost(String url,String param) throws IOException {
         return sendPost(url,null,param);
+    }
+
+    /**
+     * 向指定 URL 发送POST方法的请求
+     *
+     * @param url   发送请求的 URL
+     * @param headers 请求参数，请求参数可以是 name1=value1&name2=value2,也可以是json格式字符串。
+     * @return 所代表远程资源的响应结果
+     */
+    public static String sendPost(String url,HashMap<String, String> headers) throws IOException {
+        return sendPost(url,headers,null);
     }
 
     /**
