@@ -79,11 +79,15 @@ public class QqRobotServiceImpl implements QqRobotService {
                 }else if (message.startsWith("#生成图片")) {
                     String prompt = message.substring(6);
                     ArrayList<String> response = chatGPTServiceFactory.getChatGPTService().generatIMG(prompt);
-                    for (String s : response) {
-                        StringBuilder sb = new StringBuilder(s);
-                        sb.insert(0, "[CQ:image,file=")
-                                .append(",type=show,id=40004]");
-                        aiMessage = sb.toString();
+                    if (response != null) {
+                        for (String s : response) {
+                            StringBuilder sb = new StringBuilder(s);
+                            sb.insert(0, "[CQ:image,file=")
+                                    .append(",type=show,id=40004]");
+                            aiMessage = sb.toString();
+                        }
+                    }else {
+                        aiMessage = "生成图片失败,可能对应的服务不支持生成图片。";
                     }
                 }else {
                     aiMessage = "未知命令，请输入【帮助】查看所有命令！";
