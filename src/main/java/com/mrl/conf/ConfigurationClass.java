@@ -63,6 +63,26 @@ public class ConfigurationClass {
     @Value("${openAI.img.responseFormat}")
     public String OPENAI_IMG_FORMAT;
 
+    //百度服务应用ID
+    @Value("${baidu.appId}")
+    public String APP_ID;
+
+    //百度服务应用API_KEY
+    @Value("${baidu.apiKey}")
+    public String API_KEY;
+
+    //百度服务应用密钥
+    @Value("${baidu.secretKey}")
+    public String SECRET_KEY;
+
+    //百度账号accessKey
+    @Value("${baidu.account.accessKey}")
+    public String ACCESS_KEY_ID;
+
+    //百度账号secretKey
+    @Value("${baidu.account.secretKey}")
+    public String SECRET_ACCESS_KEY;
+
     /**
      * 测试配置文件的必输配置项是否为空
      */
