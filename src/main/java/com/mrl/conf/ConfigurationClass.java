@@ -3,6 +3,7 @@ package com.mrl.conf;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 import javax.annotation.PostConstruct;
 
@@ -13,8 +14,10 @@ import javax.annotation.PostConstruct;
  * @Version: 1.0
  */
 @Configuration
+@PropertySource(value="classpath:config.properties", encoding="UTF-8")
 @Slf4j
 public class ConfigurationClass {
+
     //cqhttp的访问url
     @Value("${cqhttp.url}")
     public String CQHTTP_URL;
@@ -63,25 +66,75 @@ public class ConfigurationClass {
     @Value("${openAI.img.responseFormat}")
     public String OPENAI_IMG_FORMAT;
 
+
+
+    //百度获取ACCESS_TOKEN接口地址
+    @Value("${baidu.getToken.url}")
+    public String BAIDU_TOKEN_URL;
     //百度服务应用ID
     @Value("${baidu.appId}")
-    public String APP_ID;
-
+    public String BAIDU_APP_ID;
     //百度服务应用API_KEY
     @Value("${baidu.apiKey}")
-    public String API_KEY;
-
+    public String BAIDU_API_KEY;
     //百度服务应用密钥
     @Value("${baidu.secretKey}")
-    public String SECRET_KEY;
-
+    public String BAIDU_SECRET_KEY;
     //百度账号accessKey
     @Value("${baidu.account.accessKey}")
-    public String ACCESS_KEY_ID;
-
+    public String BAIDU_ACCESS_KEY_ID;
     //百度账号secretKey
     @Value("${baidu.account.secretKey}")
-    public String SECRET_ACCESS_KEY;
+    public String BAIDU_SECRET_ACCESS_KEY;
+    //百度文心一言API地址
+    @Value("${baidu.wenxinyiyan.url}")
+    public String BAIDU_WXYY_URL;
+
+
+    //百度AI作画API地址
+    @Value("${baidu.aizuohua.url}")
+    public String BAIDU_AIZUOHUA_URL;
+    //百度AI作画获取图片API地址
+    @Value("${baidu.aizuohua.getImg.URL}")
+    public String BAIDU_AIZUOHUA_GETIMG_URL;
+    //百度AI作画图片大小
+    @Value("${baidu.aizuohua.size}")
+    public String BAIDU_AIZUOHUA_SIZE;
+    //百度AI作画图片数量
+    @Value("${baidu.aizuohua.num}")
+    public String BAIDU_AIZUOHUA_NUM;
+    //百度AI作画图片风格
+    @Value("${baidu.aizuohua.style}")
+    public String BAIDU_AIZUOHUA_STYLE;
+
+
+
+    //阿里云apiKey
+    @Value("${aliyun.appKey}")
+    public String ALIYUN_API_KEY;
+    //阿里云通义千问api地址
+    @Value("${aliyun.tongyiqianwen.url}")
+    public String ALIYUN_TYQW_URL;
+
+
+    //阿里云通义万象api地址
+    @Value("${aliyun.tongyiwanxiang.url}")
+    public String ALIYUN_TYWX_URL;
+    //阿里云通义万象获取图片地址
+    @Value("${aliyun.tongyiwanxiang.getImg.url}")
+    public String ALIYUN_TYWX_GETIMG_URL;
+    //通义万象生成图片的风格
+    @Value("${aliyun.tongyiwanxiang.style}")
+    public String ALIYUN_TYWX_STYLE;
+    //通义万象生成的图片数量
+    @Value("${aliyun.tongyiwanxiang.num}")
+    public String ALIYUN_TYWX_NUM;
+    //通义万象生成的图片大小
+    @Value("$aliyun.tongyiwanxiang.size}")
+    public String ALIYUN_TYWX_SIZE;
+
+
+
 
     /**
      * 测试配置文件的必输配置项是否为空

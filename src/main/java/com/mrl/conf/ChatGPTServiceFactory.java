@@ -45,5 +45,13 @@ public class ChatGPTServiceFactory {
         return null;
     }
 
+    public String getServerChoose() {
+        return SERVER_CHOOSE;
+    }
+
+    public boolean isTaskImg() {
+        return "2".equals(SERVER_CHOOSE) || "3".equals(SERVER_CHOOSE);
+    }
+
 
 }
