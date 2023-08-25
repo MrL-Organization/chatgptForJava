@@ -1,6 +1,7 @@
 package com.mrl.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jcraft.jsch.Session;
 import com.mrl.bean.ConstantClass;
 import com.mrl.bean.Message;
 import com.mrl.conf.ChatGPTServiceFactory;
@@ -8,6 +9,8 @@ import com.mrl.conf.ConfigurationClass;
 import com.mrl.service.QqRobotService;
 import com.mrl.service.TaskImgChatGPTService;
 import com.mrl.util.HttpUtils;
+import com.mrl.util.MagicPackageUtils;
+import com.mrl.util.SheelUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.bcel.Const;
 import org.springframework.stereotype.Service;
@@ -142,18 +145,41 @@ public class QqRobotServiceImpl implements QqRobotService {
                             aiMessage = "获取图片失败！";
                         }
                     }
+                }else if (message.startsWith("#打开电脑")) {
+                    if (configurationClass.CQHTTP_USERID.equals(user_id)) {
+                        String broadcastAddress = MagicPackageUtils.getBroadcastAddress(configurationClass.WOL_IP,configurationClass.WOL_MASK);
+                        aiMessage = MagicPackageUtils.sendMagicPackage(broadcastAddress,configurationClass.WOL_MAC);
+                    }else {
+                        aiMessage = "您不是此bot的管理员，无权使用该命令！";
+                    }
+
+                }else if (message.startsWith("#关闭电脑")) {
+                    if (configurationClass.CQHTTP_USERID.equals(user_id)) {
+                        if(SheelUtils.login(configurationClass.WOL_IP, configurationClass.WOL_USER, configurationClass.WOL_PASSWORD)) {
+                            String execute = SheelUtils.execCommand( "shutdown -s -t 60");
+                            SheelUtils.close();
+                            aiMessage = "指令发送成功，不出意外电脑将在60s后关闭，返回结果：" + execute;
+                        }else {
+                            aiMessage = "登录ssh失败！";
+                        }
+                    }else {
+                        aiMessage = "您不是此bot的管理员，无权使用该命令！";
+                    }
+
                 }else {
                     aiMessage = "未知命令，请输入【帮助】查看所有命令！";
                 }
             } else if ("帮助".equals(message)) {
-                aiMessage = "1.单问单答：如果只想让AI回答问题，请直接输入问题，例如【马化腾是谁】；\n" +
-                        "2.生成图片：如果要生成图片请说：【#生成图片 描述】，例如【#生成图片 打篮球的鸡】；\n" +
-                        "3.查询生成图片任务状态:输入【#查询任务状态 taskId】，查询生成图片任务状态，例如【#查询任务状态 16999422】；\n" +
-                        "4.获取生成的图片:输入【#获取图片 taskId】，获取生成的图片，例如【#获取图片 16999422】；\n" +
-                        "5.查询余额：输入【#查询余额】可以查询当前服务的余额；\n" +
-                        "6.连续聊天：输入【#开始聊天】，即可开始连续聊天，输入【#结束聊天】，即可结束聊天；\n" +
-                        "7.查询目前用的是哪个服务：输入【#当前服务】；\n" +
-                        "8.帮助:输入【帮助】，查看当前帮助信息；\n" +
+                aiMessage = "1.[CQ:face,id=32]单问单答[CQ:face,id=32]：如果只想让AI回答问题，请直接输入问题，例如【马化腾是谁】；\n" +
+                        "2.[CQ:face,id=74]生成图片[CQ:face,id=74]：如果要生成图片请说：【#生成图片 描述】，例如【#生成图片 打篮球的鸡】；\n" +
+                        "3.[CQ:face,id=179]查询生成图片任务状态[CQ:face,id=179]:输入【#查询任务状态 taskId】，查询生成图片任务状态，例如【#查询任务状态 16999422】；\n" +
+                        "4.[CQ:face,id=175]获取生成的图片[CQ:face,id=175]:输入【#获取图片 taskId】，获取生成的图片，例如【#获取图片 16999422】；\n" +
+                        "5.[CQ:face,id=176]查询余额[CQ:face,id=176]：输入【#查询余额】可以查询当前服务的余额；\n" +
+                        "6.[CQ:face,id=101]连续聊天[CQ:face,id=101]：输入【#开始聊天】，即可开始连续聊天，输入【#结束聊天】，即可结束聊天；\n" +
+                        "7.[CQ:face,id=98]查询目前用的是哪个服务[CQ:face,id=98]：输入【#当前服务】；\n" +
+                        "8.[CQ:face,id=49]帮助[CQ:face,id=49]:输入【帮助】，查看当前帮助信息；\n" +
+                        "9.[CQ:face,id=178]远程打开家里电脑[CQ:face,id=178]：输入【#打开电脑】(管理员)。\n" +
+                        "9.[CQ:face,id=39]远程关闭家里电脑[CQ:face,id=39]：输入【#关闭电脑】(管理员)。\n" +
                         "请注意，如果用的是百度AI作画或者阿里通义万象生成图片会返回taskId，然后用3的命令用taskId去查询任务状态，用4的命令去获取图片。\n" +
                         "请注意，连续聊天功能会耗费大量的tokens，请节制使用。";
             } else {

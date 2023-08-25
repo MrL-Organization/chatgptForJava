@@ -130,8 +130,21 @@ public class ConfigurationClass {
     @Value("${aliyun.tongyiwanxiang.num}")
     public String ALIYUN_TYWX_NUM;
     //通义万象生成的图片大小
-    @Value("$aliyun.tongyiwanxiang.size}")
+    @Value("${aliyun.tongyiwanxiang.size}")
     public String ALIYUN_TYWX_SIZE;
+
+
+    //wol的唤醒ip和mac
+    @Value("${wol.ip}")
+    public String WOL_IP;
+    @Value("${wol.mac}")
+    public String WOL_MAC;
+    @Value("${wol.mask}")
+    public String WOL_MASK;
+    @Value("${wol.user}")
+    public String WOL_USER;
+    @Value("${wol.password}")
+    public String WOL_PASSWORD;
 
 
 
