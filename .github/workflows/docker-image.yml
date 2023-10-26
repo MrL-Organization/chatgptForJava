@@ -48,6 +48,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
+          platforms: linux/arm/v7
           tags: ${{secrets.DOCKER_HUB_USERNAME}}/armv7-chatgpt-jdk8-cqhttp:latest
       #push后，用ssh连接服务器执行脚本
       - name: SSH
