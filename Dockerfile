@@ -1,11 +1,6 @@
 # FROM: 基础镜像，基于jdk8镜像,因为我系统用的是armv7架构，所以用这个基础镜像包
 FROM mrl111/armv7-jdk8-cn:1.0
 
-# COPY: 将应用的配置文件也拷贝到镜像中。
-COPY --from=build /app/target/*.jar /chatGPT/app.jar
-COPY --from=build /app/target/config /chatGPT/config
-COPY --from=build /app/target/lib /chatGPT/lib
-
 #添加文件
 ADD chatgptForJava/target/*.jar /chatGPT/app.jar
 ADD chatgptForJava/target/config /chatGPT/config
