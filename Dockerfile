@@ -5,7 +5,6 @@ FROM mrl111/armv7-jdk8-cn:1.0
 ADD target/*.jar /chatGPT/app.jar
 ADD target/config /chatGPT/config
 ADD target/lib /chatGPT/lib
-RUN chmod u+x /chatGPT/app.jar
 
 # EXPOSE：声明端口
 EXPOSE 9389
