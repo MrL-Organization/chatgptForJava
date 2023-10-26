@@ -1,20 +1,3 @@
-# 二开推荐阅读[如何提高项目构建效率](https://developers.weixin.qq.com/miniprogram/dev/wxcloudrun/src/scene/build/speed.html)
-# 选择构建用基础镜像。如需更换，请到[dockerhub官方仓库](https://hub.docker.com/_/java?tab=tags)自行选择后替换。
-FROM maven:3.6.0-jdk-8-slim as build
-
-# 指定构建过程中的工作目录
-WORKDIR /app
-
-# 将src目录下所有文件，拷贝到工作目录中src目录下（.gitignore/.dockerignore中文件除外）
-COPY src /app/src
-
-# 将pom.xml文件，拷贝到工作目录下
-COPY settings.xml pom.xml /app/
-
-# 执行代码编译命令
-# 自定义settings.xml, 选用国内镜像源以提高下载速度
-RUN mvn -s /app/settings.xml -f /app/pom.xml clean package
-
 # FROM: 基础镜像，基于jdk8镜像,因为我系统用的是armv7架构，所以用这个基础镜像包
 FROM mrl111/armv7-jdk8-cn:1.0
 
@@ -22,6 +5,12 @@ FROM mrl111/armv7-jdk8-cn:1.0
 COPY --from=build /app/target/*.jar /chatGPT/app.jar
 COPY --from=build /app/target/config /chatGPT/config
 COPY --from=build /app/target/lib /chatGPT/lib
+
+#添加文件
+ADD chatgptForJava/target/*.jar /chatGPT/app.jar
+ADD chatgptForJava/target/config /chatGPT/config
+ADD chatgptForJava/target/lib /chatGPT/lib
+RUN chmod u+x /chatGPT/app.jar
 
 # EXPOSE：声明端口
 EXPOSE 9389
