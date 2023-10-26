@@ -2,9 +2,9 @@
 FROM mrl111/armv7-jdk8-cn:1.0
 
 #添加文件
-ADD chatgptForJava/target/*.jar /chatGPT/app.jar
-ADD chatgptForJava/target/config /chatGPT/config
-ADD chatgptForJava/target/lib /chatGPT/lib
+ADD /home/runner/work/chatgptForJava/chatgptForJava/target/*.jar /chatGPT/app.jar
+ADD /home/runner/work/chatgptForJava/chatgptForJava/target/config /chatGPT/config
+ADD /home/runner/work/chatgptForJava/chatgptForJava/target/lib /chatGPT/lib
 RUN chmod u+x /chatGPT/app.jar
 
 # EXPOSE：声明端口
