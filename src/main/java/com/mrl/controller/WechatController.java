@@ -72,8 +72,9 @@ public class WechatController {
             //消息事件
             log.info("消息事件-接收参数：{}",params);
             result = wechatRobotService.MessageHandle(params);
-            log.info("消息事件-返回结果：{}",result);
-            return XMLUtils.mapToXml(result);
+            String r = XMLUtils.mapToXml(result);
+            log.info("消息事件-返回结果：{}",r);
+            return r;
         }else if ("event".equals(MsgType)){
             //请求事件
             //log.info("请求事件-接收参数：{}",params);

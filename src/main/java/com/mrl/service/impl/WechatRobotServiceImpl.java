@@ -55,8 +55,8 @@ public class WechatRobotServiceImpl implements WechatRobotService {
 
         //快速回复的响应参数
         HashMap<String,String> result = new HashMap<>();
-        result.put("ToUserName","FromUserName");
-        result.put("FromUserName","ToUserName");
+        result.put("ToUserName",params.get("FromUserName"));
+        result.put("FromUserName",params.get("ToUserName"));
         result.put("CreateTime",Long.toString(new Date().getTime()));
         result.put("MsgType","text");
         String message = params.get("Content");
