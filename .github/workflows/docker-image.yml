@@ -46,7 +46,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./
-          file: ./Dockerfile
+          file: ./docker/Dockerfile
           push: true
           platforms: linux/arm/v7
           tags: ${{secrets.DOCKER_HUB_USERNAME}}/armv7-chatgpt-jdk8-cqhttp:latest
