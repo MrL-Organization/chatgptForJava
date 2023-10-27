@@ -1,14 +1,27 @@
 package com.mrl.controller;
 
 import com.mrl.conf.ConfigurationClass;
+import com.mrl.service.QqRobotService;
+import com.mrl.service.WechatRobotService;
 import com.mrl.util.ShaUtils;
+import com.mrl.util.XMLUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Auther: MrL
@@ -24,7 +37,10 @@ public class WechatController {
     @Autowired
     ConfigurationClass configurationClass;
 
-    @RequestMapping("/check")
+    @Resource
+    private WechatRobotService wechatRobotService;
+
+    @GetMapping()
     public String check(@RequestParam("signature")String signature,
                         @RequestParam("timestamp")String timestamp,
                         @RequestParam("nonce")String nonce,
@@ -43,6 +59,30 @@ public class WechatController {
         }
         log.info("不是微信后台");
         return "不是微信后台";
+    }
+
+    @PostMapping()
+    public String handle(HttpServletRequest request, HttpServletResponse response) throws IOException, DocumentException {
+        log.debug("接收到微信推送：{}", request.getRequestURI());
+        HashMap<String,String> result;
+        Map<String,String> params = XMLUtils.xmlToMap(request);
+        String MsgType = params.get("MsgType");
+
+        if ("text".equals(MsgType)){
+            //消息事件
+            log.info("消息事件-接收参数：{}",params);
+            result = wechatRobotService.MessageHandle(params);
+            log.info("消息事件-返回结果：{}",result);
+            return XMLUtils.mapToXml(result);
+        }else if ("event".equals(MsgType)){
+            //请求事件
+            //log.info("请求事件-接收参数：{}",params);
+            //result = robotService.QqRobotRequestHandle(params);
+            //log.info("请求事件-返回结果：{}",result);
+        }
+
+
+        return "";
     }
 
 }

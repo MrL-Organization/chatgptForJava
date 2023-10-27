@@ -156,7 +156,7 @@ public class ConfigurationClass {
     /**
      * 测试配置文件的必输配置项是否为空
      */
-    @PostConstruct
+    //@PostConstruct
     private void testParam(){
         if("".equals(CQHTTP_URL)){
             log.error("cqhttp的访问地址为空");

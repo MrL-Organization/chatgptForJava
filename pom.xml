@@ -69,6 +69,13 @@
             <artifactId>jsch</artifactId>
             <version>0.2.11</version>
         </dependency>
+
+        <!--xml解析-->
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+        </dependency>
     </dependencies>
 
     <!--<repositories>-->
