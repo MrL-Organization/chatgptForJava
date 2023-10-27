@@ -34,7 +34,7 @@ public class WechatController {
         try {
             String tmpStr = ShaUtils.getSHA1(configurationClass.WX_SIGN_TOKEN,  timestamp,  nonce);
             log.info("检测是否匹配:tmpStr:{},signature:{}",tmpStr,signature);
-            if (signature != null && signature.equals(tmpStr)){
+            if (tmpStr.equals(signature.toUpperCase())){
                 log.info("数据源为微信后台，将echostr[{}]返回！", echostr);
                 return echostr;
             }
