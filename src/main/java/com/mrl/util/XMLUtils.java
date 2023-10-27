@@ -1,5 +1,6 @@
 package com.mrl.util;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -64,10 +65,12 @@ public class XMLUtils {
         Element emp3 = root.addElement("MsgType").addText("<![CDATA[" + map.get("MsgType") + "]]>");
         Element emp4 = root.addElement("Content").addText("<![CDATA[" + map.get("Content") + "]]>");
         //生成的xml是附带<?xml version="1.0" encoding="UTF-8"?>此行的，我还并没有测试带上返回给微信服务器是否可行，
-        // 当前没被注释的是去除此行的，如果使用注释的一行则是直接返回生成的，带上此头部的
+        //当前没被注释的是去除此行的，如果使用注释的一行则是直接返回生成的，带上此头部的
         int count = "encoding=\"UTF-8\"?".length();
         String result = dou.asXML();
         result = result.substring(result.indexOf("encoding=\"UTF-8\"?") + count + 1);
-        return result.trim();
+        return StringEscapeUtils.unescapeXml(result.trim());
+        //return StringEscapeUtils.unescapeXml(dou.asXML());
+
     }
 }
