@@ -7,7 +7,7 @@ ADD target/config /chatGPT/config
 ADD target/lib /chatGPT/lib
 
 # EXPOSE：声明端口
-EXPOSE 9389
+EXPOSE 9390
 
 #jvm参数
 ENV JAVA_OPTS=""
