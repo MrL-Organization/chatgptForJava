@@ -146,6 +146,10 @@ public class ConfigurationClass {
     @Value("${wol.password}")
     public String WOL_PASSWORD;
 
+    //微信验证签名token
+    @Value("${wechat.sign.token}")
+    public String WX_SIGN_TOKEN;
+
 
 
 
