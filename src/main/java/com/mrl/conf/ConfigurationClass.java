@@ -147,8 +147,18 @@ public class ConfigurationClass {
     public String WOL_PASSWORD;
 
     //微信验证签名token
+    @Value("${wechat.getToken.url}")
+    public String WX_GETTOKEN_URL;
     @Value("${wechat.sign.token}")
     public String WX_SIGN_TOKEN;
+    @Value("${wechat.appid}")
+    public String WX_APPID;
+    @Value("${wechat.secret}")
+    public String WX_SECRET;
+    @Value("${wechat.admin}")
+    public String WX_ADMIN;
+    @Value("${wechat.sendMsg.url}")
+    public String WX_SENDMSG_URL;
 
 
 

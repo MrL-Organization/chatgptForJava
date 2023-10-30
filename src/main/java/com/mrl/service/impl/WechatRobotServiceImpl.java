@@ -1,5 +1,6 @@
 package com.mrl.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mrl.bean.ConstantClass;
 import com.mrl.bean.Message;
@@ -13,6 +14,7 @@ import com.mrl.util.SheelUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,6 +49,34 @@ public class WechatRobotServiceImpl implements WechatRobotService {
 
     //设置30分钟过期时间
     final long EXPIRED_TIME = 1000*60*30;
+
+    //微信ACCESS_TOKEN
+    private String ACCESS_TOKEN;
+
+    //@PostConstruct
+    private void setToken(){
+        log.info("wechat开始获取access_token");
+        HashMap<String,Object> params = new HashMap<>();
+        params.put("grant_type","client_credential");
+        params.put("appid",configurationClass.WX_APPID);
+        params.put("secret",configurationClass.WX_SECRET);
+        JSONObject jsonObject = null;
+        try{
+            String response = HttpUtils.sendGet(configurationClass.WX_GETTOKEN_URL, HttpUtils.asUrlParams(params));
+            log.debug("获取ACCESS_TOKEN请求结果：{}",response);
+            jsonObject = JSON.parseObject(response);
+            this.ACCESS_TOKEN = jsonObject.getString("access_token");
+            log.info("设置ACCESS_TOKEN:{}",ACCESS_TOKEN);
+        }catch (Exception e){
+            if (jsonObject != null){
+                String errcode = jsonObject.getString("errcode");
+                String errmsg = jsonObject.getString("errmsg");
+                log.error("获取ACCESS_TOKEN失败,errcode:{},errmsg:{}",errcode,errmsg);
+            }else {
+                log.error("获取ACCESS_TOKEN失败，原因：{}",e.getMessage());
+            }
+        }
+    }
 
     @Override
     //消息事件处理
@@ -143,7 +173,7 @@ public class WechatRobotServiceImpl implements WechatRobotService {
                         }
                     }
                 }else if (message.startsWith("#打开电脑")) {
-                    if (configurationClass.CQHTTP_USERID.equals(userId)) {
+                    if (configurationClass.WX_ADMIN.equals(userId)) {
                         String broadcastAddress = MagicPackageUtils.getBroadcastAddress(configurationClass.WOL_IP,configurationClass.WOL_MASK);
                         aiMessage = new StringBuilder(MagicPackageUtils.sendMagicPackage(broadcastAddress, configurationClass.WOL_MAC));
                     }else {
@@ -151,7 +181,7 @@ public class WechatRobotServiceImpl implements WechatRobotService {
                     }
 
                 }else if (message.startsWith("#关闭电脑")) {
-                    if (configurationClass.CQHTTP_USERID.equals(userId)) {
+                    if (configurationClass.WX_ADMIN.equals(userId)) {
                         if(SheelUtils.login(configurationClass.WOL_IP, configurationClass.WOL_USER, configurationClass.WOL_PASSWORD)) {
                             String execute = SheelUtils.execCommand( "shutdown -s -t 60");
                             SheelUtils.close();
@@ -176,7 +206,7 @@ public class WechatRobotServiceImpl implements WechatRobotService {
                         "7.查询目前用的是哪个服务：输入【#当前服务】；\n" +
                         "8.帮助:输入【帮助】，查看当前帮助信息；\n" +
                         "9.远程打开家里电脑：输入【#打开电脑】(管理员)。\n" +
-                        "9.远程关闭家里电脑：输入【#关闭电脑】(管理员)。\n" +
+                        "10.远程关闭家里电脑：输入【#关闭电脑】(管理员)。\n" +
                         "请注意，如果用的是百度AI作画或者阿里通义万象生成图片会返回taskId，然后用3的命令用taskId去查询任务状态，用4的命令去获取图片。\n" +
                         "请注意，连续聊天功能会耗费大量的tokens，请节制使用。");
             } else {
@@ -212,7 +242,11 @@ public class WechatRobotServiceImpl implements WechatRobotService {
         } catch (Exception e) {
             log.error("WechatRobotService出错:{}", e.getMessage());
             e.printStackTrace();
-            sendPrivateMsg(e.getMessage(),userId);
+            //try {
+            //    sendPrivateMsg(e.getMessage(),userId);
+            //} catch (Exception ex) {
+            //    log.error("WechatRobotService.sendPrivateMsg出错:{}", ex.getMessage());
+            //}
         }
         log.debug("WechatRobotServiceImpl.WechatRobotMessageHandle结束");
         return result;
@@ -247,23 +281,29 @@ public class WechatRobotServiceImpl implements WechatRobotService {
     }
 
     /**
-     * 发送私聊消息
+     * 发送私聊消息-无接口权限，公众号必须完成微信认证，但是个人公众号不能进行微信认证
      */
     @Override
-    public void sendPrivateMsg(String message, String userId) {
-        //log.debug("WechatRobotServiceImpl.sendPrivateMsg开始");
-        //if ("".equals(userId) || userId == null){
-        //    userId = configurationClass.CQHTTP_USERID;
-        //}
-        //String url = configurationClass.CQHTTP_URL + "/send_private_msg?access_token=" + configurationClass.ACCESS_TOKEN;
-        //HashMap<String,Object> params = new HashMap<>();
-        //params.put("user_id", userId);
-        //params.put("message", message);
-        //log.info("私聊消息接口post请求地址:{}", url);
-        //log.info("私聊消息接口post请求参数:{}", params);
-        //String response = HttpUtils.sendPost(url, null, HttpUtils.asUrlParams(params));
-        //log.info("私聊消息接口post请求返回信息:{}", response);
-        //log.debug("WechatRobotServiceImpl.sendPrivateMsg结束");
+    public void sendPrivateMsg(String message, String userId) throws IOException {
+        log.debug("WechatRobotServiceImpl.sendPrivateMsg开始");
+        if (ACCESS_TOKEN == null || "".equals(ACCESS_TOKEN)){
+            setToken();
+        }
+        if ("".equals(userId) || userId == null){
+            userId = configurationClass.WX_ADMIN;
+        }
+        String url = configurationClass.WX_SENDMSG_URL + "?access_token=" + ACCESS_TOKEN;
+        HashMap<String,Object> params = new HashMap<>();
+        params.put("touser", userId);
+        params.put("msgtype", "text");
+        HashMap<String,Object> text = new HashMap<>();
+        text.put("content",message);
+        params.put("text", text);
+        log.info("私聊消息接口post请求地址:{}", url);
+        log.info("私聊消息接口post请求参数:{}", params);
+        String response = HttpUtils.sendPost(url, null, HttpUtils.asUrlParams(params));
+        log.info("私聊消息接口post请求返回信息:{}", response);
+        log.debug("WechatRobotServiceImpl.sendPrivateMsg结束");
     }
 
 }

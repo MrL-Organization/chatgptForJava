@@ -15,5 +15,5 @@ import java.util.Map;
 public interface WechatRobotService {
     HashMap<String,String> MessageHandle(Map<String,String> params);
     HashMap<String,Object> EventHandle(Map<String,String> params);
-    void sendPrivateMsg(String message, String userId);
+    void sendPrivateMsg(String message, String userId) throws IOException;
 }

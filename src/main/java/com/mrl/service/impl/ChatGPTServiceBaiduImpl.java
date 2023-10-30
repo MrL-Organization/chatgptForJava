@@ -16,6 +16,7 @@ import com.mrl.util.HttpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -209,6 +210,7 @@ public class ChatGPTServiceBaiduImpl implements TaskImgChatGPTService {
         return result;
     }
 
+    @PostConstruct
     private void setAccessToken()  {
         log.info("开始获取access_token");
         HashMap<String,Object> params = new HashMap<>();
