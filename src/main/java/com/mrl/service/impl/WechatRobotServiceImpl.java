@@ -223,18 +223,21 @@ public class WechatRobotServiceImpl implements WechatRobotService {
                     }else{
                         //处于连续聊天状态，从user_messages里拿历史记录
                         messages = user_messages.computeIfAbsent(userId, k -> new ArrayList<>());
-                        Message send = new Message("user", message);
                         if (messages.size() % 2 == 0) {
+                            Message send = new Message("user", message);
                             messages.add(send);
-                        }
-                        String responseMsg = chatGPTServiceFactory.getChatGPTService().chat(messages);
-                        if (responseMsg == null || "".equals(responseMsg)){
-                            aiMessage = new StringBuilder("服务异常，请稍后再试！");
+                            String responseMsg = chatGPTServiceFactory.getChatGPTService().chat(messages);
+                            if (responseMsg == null || "".equals(responseMsg)){
+                                aiMessage = new StringBuilder("服务异常，请稍后再试！");
+                            }else {
+                                aiMessage = new StringBuilder(responseMsg);
+                                Message response = new Message("assistant", aiMessage.toString());
+                                messages.add(response);
+                            }
                         }else {
-                            aiMessage = new StringBuilder(responseMsg);
-                            Message response = new Message("assistant", aiMessage.toString());
-                            messages.add(response);
+                            Thread.sleep(5000);
                         }
+
                     }
                 }else {
                     //获取ai的返回信息,单问单答
