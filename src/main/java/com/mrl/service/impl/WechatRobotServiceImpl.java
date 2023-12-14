@@ -93,8 +93,8 @@ public class WechatRobotServiceImpl implements WechatRobotService {
         String userId = params.get("FromUserName");
         try {
             StringBuilder aiMessage = new StringBuilder();
-            if (message.startsWith("#")){
-                if ("#开始聊天".equals(message)){
+            if (message.startsWith("$")){
+                if ("$开始聊天".equals(message)){
                     if (user_status.get(userId) != null && user_status.get(userId)){
                         aiMessage = new StringBuilder("已开启连续聊天，请不要重复开启！");
                     }else {
@@ -102,21 +102,21 @@ public class WechatRobotServiceImpl implements WechatRobotService {
                         user_time.put(userId,new Date());
                         aiMessage = new StringBuilder("已开启连续聊天，会增加tokens的使用量，聊天内容请不要过长，30分钟未关闭连续聊天，会自动关闭。");
                     }
-                }else if ("#结束聊天".equals(message)){
+                }else if ("$结束聊天".equals(message)){
                     user_status.remove(userId);
                     user_messages.remove(userId);
                     user_time.remove(userId);
                     aiMessage = new StringBuilder("已关闭连续聊天！");
-                }else if ("#查询余额".equals(message)) {
+                }else if ("$查询余额".equals(message)) {
                     aiMessage = new StringBuilder(chatGPTServiceFactory.getChatGPTService().queryBalance());
-                }else if ("#当前服务".equals(message)) {
+                }else if ("$当前服务".equals(message)) {
                     switch (chatGPTServiceFactory.getServerChoose()){
                         case "1" : aiMessage = new StringBuilder("当前服务为openAI的chatgpt和生成图片"); break;
                         case "2" : aiMessage = new StringBuilder("当前服务为百度的文心一言和AI作画"); break;
                         case "3" : aiMessage = new StringBuilder("当前服务为阿里的通义千问和通义万象"); break;
                         case "4" : aiMessage = new StringBuilder("当前服务为微软的newBing"); break;
                     }
-                }else if (message.startsWith("#生成图片")) {
+                }else if (message.startsWith("$生成图片")) {
                     String prompt = message.substring(6);
                     ArrayList<String> response = chatGPTServiceFactory.getChatGPTService().generatIMG(prompt);
                     if (response != null && response.size() > 0) {
@@ -131,15 +131,15 @@ public class WechatRobotServiceImpl implements WechatRobotService {
                     }else {
                         aiMessage = new StringBuilder("生成图片失败,可能对应的服务不支持生成图片。");
                     }
-                }else if (message.startsWith("#查询任务状态")) {
+                }else if (message.startsWith("$查询任务状态")) {
                     if (!chatGPTServiceFactory.isTaskImg()) {
-                        aiMessage = new StringBuilder("只有百度AI作画或者阿里通义万象生成图片需要用taskId去获取图片，你可以输入【#当前服务】来查询当前使用的的服务。");
+                        aiMessage = new StringBuilder("只有百度AI作画或者阿里通义万象生成图片需要用taskId去获取图片，你可以输入【$当前服务】来查询当前使用的的服务。");
                     }else {
                         String taskId = message.substring(8);
                         String response = ((TaskImgChatGPTService) chatGPTServiceFactory.getChatGPTService()).getImgTaskStatus(taskId);
                         switch (response) {
                             case ConstantClass.TASK_STATUS_SUCCESS:
-                                aiMessage = new StringBuilder("任务成功，请用【#获取图片 taskId】获取图片。");
+                                aiMessage = new StringBuilder("任务成功，请用【$获取图片 taskId】获取图片。");
                                 break;
                             case ConstantClass.TASK_STATUS_FAILED:
                                 aiMessage = new StringBuilder("任务失败！");
@@ -158,9 +158,9 @@ public class WechatRobotServiceImpl implements WechatRobotService {
                                 break;
                         }
                     }
-                }else if (message.startsWith("#获取图片")) {
+                }else if (message.startsWith("$获取图片")) {
                     if (!chatGPTServiceFactory.isTaskImg()) {
-                        aiMessage = new StringBuilder("只有百度AI作画或者阿里通义万象生成图片需要用taskId去获取图片，你可以输入【#当前服务】来查询当前使用的的服务。");
+                        aiMessage = new StringBuilder("只有百度AI作画或者阿里通义万象生成图片需要用taskId去获取图片，你可以输入【$当前服务】来查询当前使用的的服务。");
                     }else {
                         String taskId = message.substring(6);
                         ArrayList<String> response = ((TaskImgChatGPTService) chatGPTServiceFactory.getChatGPTService()).getImg(taskId);
@@ -172,7 +172,7 @@ public class WechatRobotServiceImpl implements WechatRobotService {
                             aiMessage = new StringBuilder("获取图片失败！");
                         }
                     }
-                }else if (message.startsWith("#打开电脑")) {
+                }else if (message.startsWith("$打开电脑")) {
                     if (configurationClass.WX_ADMIN.equals(userId)) {
                         String broadcastAddress = MagicPackageUtils.getBroadcastAddress(configurationClass.WOL_IP,configurationClass.WOL_MASK);
                         aiMessage = new StringBuilder(MagicPackageUtils.sendMagicPackage(broadcastAddress, configurationClass.WOL_MAC));
@@ -180,7 +180,7 @@ public class WechatRobotServiceImpl implements WechatRobotService {
                         aiMessage = new StringBuilder("您不是此bot的管理员，无权使用该命令！");
                     }
 
-                }else if (message.startsWith("#关闭电脑")) {
+                }else if (message.startsWith("$关闭电脑")) {
                     if (configurationClass.WX_ADMIN.equals(userId)) {
                         if(SheelUtils.login(configurationClass.WOL_IP, configurationClass.WOL_USER, configurationClass.WOL_PASSWORD)) {
                             String execute = SheelUtils.execCommand( "shutdown -s -t 60");
@@ -198,15 +198,15 @@ public class WechatRobotServiceImpl implements WechatRobotService {
                 }
             } else if ("帮助".equals(message)) {
                 aiMessage = new StringBuilder("1.单问单答：如果只想让AI回答问题，请直接输入问题，例如【马化腾是谁】；\n" +
-                        "2.生成图片：如果要生成图片请说：【#生成图片 描述】，例如【#生成图片 打篮球的鸡】；\n" +
-                        "3.查询生成图片任务状态:输入【#查询任务状态 taskId】，查询生成图片任务状态，例如【#查询任务状态 16999422】；\n" +
-                        "4.获取生成的图片:输入【#获取图片 taskId】，获取生成的图片，例如【#获取图片 16999422】；\n" +
-                        "5.查询余额：输入【#查询余额】可以查询当前服务的余额；\n" +
-                        "6.连续聊天：输入【#开始聊天】，即可开始连续聊天，输入【#结束聊天】，即可结束聊天；\n" +
-                        "7.查询目前用的是哪个服务：输入【#当前服务】；\n" +
+                        "2.生成图片：如果要生成图片请说：【$生成图片 描述】，例如【$生成图片 打篮球的鸡】；\n" +
+                        "3.查询生成图片任务状态:输入【$查询任务状态 taskId】，查询生成图片任务状态，例如【$查询任务状态 16999422】；\n" +
+                        "4.获取生成的图片:输入【$获取图片 taskId】，获取生成的图片，例如【$获取图片 16999422】；\n" +
+                        "5.查询余额：输入【$查询余额】可以查询当前服务的余额；\n" +
+                        "6.连续聊天：输入【$开始聊天】，即可开始连续聊天，输入【$结束聊天】，即可结束聊天；\n" +
+                        "7.查询目前用的是哪个服务：输入【$当前服务】；\n" +
                         "8.帮助:输入【帮助】，查看当前帮助信息；\n" +
-                        "9.远程打开家里电脑：输入【#打开电脑】(管理员)。\n" +
-                        "10.远程关闭家里电脑：输入【#关闭电脑】(管理员)。\n" +
+                        "9.远程打开家里电脑：输入【$打开电脑】(管理员)。\n" +
+                        "10.远程关闭家里电脑：输入【$关闭电脑】(管理员)。\n" +
                         "请注意，如果用的是百度AI作画或者阿里通义万象生成图片会返回taskId，然后用3的命令用taskId去查询任务状态，用4的命令去获取图片。\n" +
                         "请注意，连续聊天功能会耗费大量的tokens，请节制使用。");
             } else {
