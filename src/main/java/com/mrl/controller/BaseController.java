@@ -45,7 +45,6 @@ public class BaseController {
         Result result = new Result();
         String message = "";
         try {
-            // if(SheelUtils.login("192.168.3.102", "root", "4836146")) {
             if(SheelUtils.login(configurationClass.WOL_IP, configurationClass.WOL_USER, configurationClass.WOL_PASSWORD)) {
                 String execute = SheelUtils.execCommand( "shutdown -s -t 60");
                 SheelUtils.close();
