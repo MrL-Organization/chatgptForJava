@@ -51,12 +51,12 @@ jobs:
           platforms: linux/arm/v7
           tags: ${{secrets.DOCKER_HUB_USERNAME}}/armv7-chatgpt-jdk8-cqhttp:dev
       #push后，用ssh连接服务器执行脚本
-      - name: SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{secrets.SERVER_HOST}}
-          username: ${{secrets.SERVER_USERNAME}}
-          port: ${{secrets.SERVER_PORT }}
-          password: ${{secrets.SERVER_PASSWORD}}
-          script:
-            sh /www/testgpt/start.sh
+      #- name: SSH
+      #  uses: appleboy/ssh-action@master
+      #  with:
+      #    host: ${{secrets.SERVER_HOST}}
+      #    username: ${{secrets.SERVER_USERNAME}}
+      #    port: ${{secrets.SERVER_PORT }}
+      #    password: ${{secrets.SERVER_PASSWORD}}
+      #    script:
+      #      sh /www/testgpt/start.sh
