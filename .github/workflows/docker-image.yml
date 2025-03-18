@@ -21,7 +21,7 @@ jobs:
           distribution: 'adopt'
       # maven缓存，不加的话每次都会去重新拉取，会影响速度
       - name: Dependies Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
